@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AutoCare-AI | Image Inspection</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #080d12;
+            color: white;
+        }
+
+        nav {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7%;
+            background: #111820;
+            border-bottom: 1px solid #263341;
+        }
+
+        .logo {
+            color: #00d9ff;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .nav-links a:hover {
+            color: #00d9ff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: #111820;
+            border: 1px solid #263341;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00d9ff;
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #aebbc7;
+            margin-bottom: 30px;
+        }
+
+        .upload-box {
+            border: 2px dashed #00d9ff;
+            border-radius: 15px;
+            padding: 35px;
+        }
+
+        input[type="file"] {
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        button {
+            background: #00d9ff;
+            color: #001018;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #00aee0;
+        }
+
+        #preview {
+            margin-top: 30px;
+        }
+
+        #preview img {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 15px;
+            border: 1px solid #344454;
+        }
+
+        #result {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: #080d12;
+            border: 1px solid #263341;
+            border-radius: 15px;
+            text-align: left;
+        }
+
+        #result h2 {
+            color: #00d9ff;
+        }
+
+        #result h3 {
+            color: #00d9ff;
+            margin-top: 25px;
+        }
+
+        #result li {
+            margin: 8px 0;
+        }
+
+        .chatbot {
+            position: fixed;
+            right: 25px;
+            bottom: 25px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #00bfff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 0 25px rgba(0, 200, 255, 0.5);
+        }
+
+        @media (max-width: 700px) {
+
+            nav {
+                padding: 0 20px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 14px;
+            }
+
+            .container {
+                margin: 25px auto;
+            }
+
+            .card {
+                padding: 25px 18px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <nav>
+
+        <div class="logo">
+            AutoCare-AI
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/diagnosis">
+                AI Diagnosis
+            </a>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/image-inspection">
+                Image Inspection
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <div class="container">
+
+        <div class="card">
+
+            <h1>
+                🚗 Vehicle Image Inspection
+            </h1>
+
+            <p class="subtitle">
+                Upload your vehicle image for AI-assisted visual inspection.
+            </p>
+
+
+            <div class="upload-box">
+
+                <input
+                    type="file"
+                    id="vehicleImage"
+                    accept="image/png,image/jpeg,image/webp"
+                >
+
+                <br>
+
+                <button onclick="inspectImage()">
+                    🔍 Inspect Vehicle
+                </button>
+
+            </div>
+
+
+            <div id="preview"></div>
+
+            <div id="result"></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="chatbot">
+        🤖
+    </div>
+
+
+    <script>
+
+        async function inspectImage() {
+
+            const input =
+                document.getElementById("vehicleImage");
+
+            const preview =
+                document.getElementById("preview");
+
+            const resultBox =
+                document.getElementById("result");
+
+
+            if (!input.files.length) {
+
+                alert("Please select a vehicle image.");
+
+                return;
+            }
+
+
+            const file = input.files[0];
+
+
+            preview.innerHTML = `
+                <img src="${URL.createObjectURL(file)}">
+            `;
+
+
+            resultBox.style.display = "block";
+
+            resultBox.innerHTML = `
+                <h2>🔄 Analyzing Image...</h2>
+                <p>Please wait...</p>
+            `;
+
+
+            const formData = new FormData();
+
+            formData.append("image", file);
+
+
+            try {
+
+                const response = await fetch(
+                    "/api/image-inspection",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                if (!data.success) {
+
+                    resultBox.innerHTML = `
+                        <h2>❌ Inspection Failed</h2>
+                        <p>${data.message}</p>
+                    `;
+
+                    return;
+                }
+
+
+                const result = data.result;
+
+
+                resultBox.innerHTML = `
+
+                    <h2>✅ Inspection Result</h2>
+
+                    <p>
+                        <strong>Condition:</strong>
+                        ${result.condition}
+                    </p>
+
+                    <p>
+                        <strong>Severity:</strong>
+                        ${result.severity}
+                    </p>
+
+                    <p>
+                        <strong>Confidence:</strong>
+                        ${result.confidence}%
+                    </p>
+
+                    <p>
+                        <strong>Estimated Cost:</strong>
+                        ${result.estimated_cost}
+                    </p>
+
+
+                    <h3>🔎 Observations</h3>
+
+                    <ul>
+                        ${result.observations.map(item => `
+                            <li>${item}</li>
+                        `).join("")}
+                    </ul>
+
+
+                    <h3>🛠 Recommendations</h3>
+
+                    <ul>
+                        ${result.recommendations.map(item => `
+                            <li>${item}</li>
+                        `).join("")}
+                    </ul>
+
+                `;
+
+            }
+
+
+            catch (error) {
+
+                console.error(error);
+
+                resultBox.innerHTML = `
+                    <h2>❌ Error</h2>
+                    <p>
+                        Unable to connect to AutoCare-AI.
+                    </p>
+                `;
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

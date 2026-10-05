@@ -1,0 +1,616 @@
+{% extends "base.html" %}
+
+{% block title %}AutoCare-AI | Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+    .dashboard {
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 35px 20px 60px;
+    }
+
+    .dashboard-header {
+        margin-bottom: 30px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 38px;
+        margin-bottom: 8px;
+        color: #ffffff;
+    }
+
+    .dashboard-header p {
+        color: #94a3b8;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: linear-gradient(145deg, #111923, #0b1118);
+        border: 1px solid #263545;
+        border-radius: 16px;
+        padding: 22px;
+    }
+
+    .stat-card .icon {
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+
+    .stat-card h3 {
+        margin: 0;
+        font-size: 30px;
+        color: #00d9ff;
+    }
+
+    .stat-card p {
+        margin: 6px 0 0;
+        color: #94a3b8;
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 22px;
+        margin-bottom: 25px;
+    }
+
+    .dashboard-card {
+        background: linear-gradient(145deg, #111923, #0b1118);
+        border: 1px solid #263545;
+        border-radius: 18px;
+        padding: 25px;
+        margin-bottom: 22px;
+    }
+
+    .dashboard-card h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .vehicle-card {
+        background: #0b1118;
+        border: 1px solid #263545;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+
+    .vehicle-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .vehicle-top h3 {
+        margin: 0;
+        font-size: 21px;
+    }
+
+    .vehicle-info {
+        color: #94a3b8;
+        margin-top: 8px;
+    }
+
+    .health-section {
+        text-align: center;
+    }
+
+    .health-circle {
+        width: 180px;
+        height: 180px;
+        margin: 20px auto;
+        border-radius: 50%;
+        border: 12px solid #00d9ff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 35px rgba(0, 217, 255, 0.18);
+    }
+
+    .health-circle strong {
+        font-size: 42px;
+        color: #00d9ff;
+    }
+
+    .health-circle span {
+        color: #94a3b8;
+    }
+
+    .health-status {
+        font-size: 22px;
+        font-weight: bold;
+        color: #00d9ff;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .full {
+        grid-column: 1 / -1;
+    }
+
+    .primary-btn {
+        width: 100%;
+        background: linear-gradient(90deg, #00d9ff, #008cff);
+        color: #001018;
+        border: none;
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .primary-btn:hover {
+        transform: translateY(-1px);
+        opacity: 0.9;
+    }
+
+    .diagnosis-item {
+        padding: 18px;
+        border: 1px solid #263545;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        background: #0b1118;
+    }
+
+    .diagnosis-item h3 {
+        margin: 0 0 8px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        background: #1e293b;
+        color: #00d9ff;
+    }
+
+    .reminder {
+        padding: 15px;
+        border-left: 3px solid #00d9ff;
+        background: #0b1118;
+        margin-bottom: 12px;
+        border-radius: 8px;
+    }
+
+    .reminder h4 {
+        margin: 0 0 5px;
+    }
+
+    .reminder p {
+        margin: 4px 0;
+        color: #94a3b8;
+    }
+
+    .complete-btn {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 7px 12px;
+        border-radius: 7px;
+        background: #1e293b;
+        color: #00d9ff;
+        text-decoration: none;
+        font-size: 13px;
+    }
+
+    .empty {
+        color: #64748b;
+        text-align: center;
+        padding: 20px;
+    }
+
+    @media (max-width: 900px) {
+        .grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-header h1 {
+            font-size: 30px;
+        }
+    }
+</style>
+
+<div class="dashboard">
+
+    <div class="dashboard-header">
+        <h1>Vehicle Health Dashboard</h1>
+        <p>Monitor your vehicle, diagnose problems and manage maintenance.</p>
+    </div>
+
+    <!-- STAT CARDS -->
+
+    <div class="grid">
+
+        <div class="stat-card">
+            <div class="icon">🚗</div>
+            <h3>{{ vehicles|length }}</h3>
+            <p>Registered Vehicles</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="icon">🤖</div>
+            <h3>{{ diagnoses|length }}</h3>
+            <p>AI Diagnoses</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="icon">📅</div>
+            <h3>{{ reminders|length }}</h3>
+            <p>Service Reminders</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="icon">🛠️</div>
+            <h3>AI</h3>
+            <p>Smart Vehicle Care</p>
+        </div>
+
+    </div>
+
+    <!-- VEHICLE + HEALTH -->
+
+    <div class="main-grid">
+
+        <div class="dashboard-card">
+
+            <h2>🚗 My Vehicles</h2>
+
+            {% for vehicle in vehicles %}
+
+            <div class="vehicle-card">
+
+                <div class="vehicle-top">
+
+                    <h3>
+                        {{ vehicle["name"] }}
+                    </h3>
+
+                    <span class="badge">
+                        Active
+                    </span>
+
+                </div>
+
+                <div class="vehicle-info">
+
+                    {{ vehicle["brand"] }}
+                    {{ vehicle["model"] }}
+
+                    {% if vehicle["year"] %}
+                    • {{ vehicle["year"] }}
+                    {% endif %}
+
+                    {% if vehicle["mileage"] %}
+                    • {{ vehicle["mileage"] }} km
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty">
+                No vehicles registered.
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="dashboard-card health-section">
+
+            <h2>❤️ Vehicle Health</h2>
+
+            <div class="health-circle">
+
+                <strong id="healthScore">--</strong>
+
+                <span>/ 100</span>
+
+            </div>
+
+            <div
+                id="healthStatus"
+                class="health-status">
+                Loading...
+            </div>
+
+            <p style="color:#94a3b8;">
+                Overall vehicle condition
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- ADD VEHICLE -->
+
+    <div class="dashboard-card">
+
+        <h2>➕ Add New Vehicle</h2>
+
+        <form action="/add_vehicle" method="POST">
+
+            <div class="form-grid">
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Vehicle Name"
+                    required
+                >
+
+                <input
+                    type="text"
+                    name="brand"
+                    placeholder="Brand"
+                    required
+                >
+
+                <input
+                    type="text"
+                    name="model"
+                    placeholder="Model"
+                    required
+                >
+
+                <input
+                    type="number"
+                    name="year"
+                    placeholder="Manufacturing Year"
+                >
+
+                <input
+                    type="number"
+                    name="mileage"
+                    placeholder="Mileage (km)"
+                    class="full"
+                >
+
+                <button
+                    type="submit"
+                    class="primary-btn full">
+                    Add Vehicle
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- AI DIAGNOSIS HISTORY -->
+
+    <div class="dashboard-card">
+
+        <h2>🤖 Recent AI Diagnoses</h2>
+
+        {% for diagnosis in diagnoses %}
+
+        <div class="diagnosis-item">
+
+            <h3>
+                {{ diagnosis["diagnosis"] }}
+            </h3>
+
+            <p style="color:#94a3b8;">
+                Vehicle:
+                {{ diagnosis["vehicle_name"] }}
+            </p>
+
+            <span class="badge">
+                Severity: {{ diagnosis["severity"] }}
+            </span>
+
+            <span class="badge">
+                Confidence: {{ diagnosis["confidence"] }}%
+            </span>
+
+            <p>
+                Estimated Cost:
+                <strong>
+                    {{ diagnosis["estimated_cost"] }}
+                </strong>
+            </p>
+
+            <p style="color:#94a3b8;">
+                {{ diagnosis["symptoms"] }}
+            </p>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+            No AI diagnosis history available.
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- SERVICE REMINDERS -->
+
+    <div class="dashboard-card">
+
+        <h2>📅 Service Reminders</h2>
+
+        {% for reminder in reminders %}
+
+        <div class="reminder">
+
+            <h4>
+                {{ reminder["title"] }}
+            </h4>
+
+            <p>
+                Vehicle: {{ reminder["vehicle_name"] }}
+            </p>
+
+            <p>
+                Due Date: {{ reminder["due_date"] }}
+            </p>
+
+            <p>
+                Status: {{ reminder["status"] }}
+            </p>
+
+            {% if reminder["status"] == "Pending" %}
+
+            <a
+                class="complete-btn"
+                href="/complete_reminder/{{ reminder['id'] }}">
+                Mark Completed
+            </a>
+
+            {% endif %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+            No service reminders.
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- ADD REMINDER -->
+
+    <div class="dashboard-card">
+
+        <h2>📅 Add Service Reminder</h2>
+
+        <form action="/add_reminder" method="POST">
+
+            <div class="form-grid">
+
+                <select name="vehicle_id" required>
+
+                    <option value="">
+                        Select Vehicle
+                    </option>
+
+                    {% for vehicle in vehicles %}
+
+                    <option value="{{ vehicle['id'] }}">
+                        {{ vehicle["name"] }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <input
+                    type="text"
+                    name="title"
+                    placeholder="Service Reminder"
+                    required
+                >
+
+                <input
+                    type="date"
+                    name="due_date"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="primary-btn">
+                    Add Reminder
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+async function loadVehicleHealth() {
+
+    {% if vehicles %}
+
+    const vehicleId = "{{ vehicles[0]['id'] }}";
+
+    try {
+
+        const response = await fetch(
+            `/api/vehicle-health?vehicle_id=${vehicleId}`
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            document.getElementById("healthScore").textContent =
+                data.health_score;
+
+            document.getElementById("healthStatus").textContent =
+                data.condition;
+
+        } else {
+
+            document.getElementById("healthScore").textContent = "0";
+            document.getElementById("healthStatus").textContent =
+                "Unknown";
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("healthScore").textContent = "--";
+        document.getElementById("healthStatus").textContent =
+            "Unavailable";
+    }
+
+    {% else %}
+
+    document.getElementById("healthScore").textContent = "0";
+    document.getElementById("healthStatus").textContent = "No Vehicle";
+
+    {% endif %}
+}
+
+loadVehicleHealth();
+
+</script>
+
+{% endblock %}

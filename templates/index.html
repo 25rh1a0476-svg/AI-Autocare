@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}AutoCare-AI | Home{% endblock %}
+
+{% block content %}
+
+<div class="hero">
+
+    <h1>AutoCare-AI</h1>
+
+    <p>
+        Intelligent Vehicle Health Monitoring and AI Diagnosis System
+    </p>
+
+    <br>
+
+    <a href="/diagnosis">
+        <button>Start AI Diagnosis</button>
+    </a>
+
+</div>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>About AutoCare-AI</h2>
+
+        <p>
+            AutoCare-AI is an intelligent vehicle assistance platform
+            designed to analyze vehicle symptoms and provide possible
+            diagnoses, severity levels, repair cost estimates and
+            maintenance recommendations.
+        </p>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Registered Vehicles</h2>
+
+        {% if vehicles %}
+
+            {% for vehicle in vehicles %}
+
+            <div style="padding: 15px; border-bottom: 1px solid #26313d;">
+
+                <h3>{{ vehicle["name"] }}</h3>
+
+                <p>
+                    Brand: {{ vehicle["brand"] }} |
+                    Model: {{ vehicle["model"] }} |
+                    Year: {{ vehicle["year"] }}
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No vehicles registered.</p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

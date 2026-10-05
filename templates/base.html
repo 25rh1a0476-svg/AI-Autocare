@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}AutoCare-AI{% endblock %}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0f14;
+            color: white;
+        }
+
+        nav {
+            background: #111820;
+            padding: 18px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #26313d;
+        }
+
+        nav h2 {
+            margin: 0;
+            color: #00d9ff;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        nav a:hover {
+            color: #00d9ff;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: #111820;
+            border: 1px solid #26313d;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            background: #00d9ff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 15px;
+            background: #0b0f14;
+            color: white;
+            border: 1px solid #34404d;
+            border-radius: 8px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 70px 20px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            color: #00d9ff;
+        }
+
+        .hero p {
+            color: #b5c0ca;
+            font-size: 18px;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #0b0f14;
+            border-radius: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <h2>AutoCare-AI</h2>
+
+    <div>
+        <a href="/">Home</a>
+        <a href="/diagnosis">AI Diagnosis</a>
+        <a href="/dashboard">Dashboard</a>
+    </div>
+</nav>
+
+{% block content %}
+{% endblock %}
+<!-- =========================
+     AI CHATBOT
+========================= -->
+
+<style>
+    .chatbot-button {
+        position: fixed;
+        right: 25px;
+        bottom: 25px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #00d9ff, #0077ff);
+        color: #001018;
+        font-size: 25px;
+        cursor: pointer;
+        box-shadow: 0 0 25px rgba(0, 217, 255, 0.35);
+        z-index: 9999;
+    }
+
+    .chatbot-box {
+        position: fixed;
+        right: 25px;
+        bottom: 95px;
+        width: 360px;
+        height: 500px;
+        background: #0d141d;
+        border: 1px solid #263545;
+        border-radius: 18px;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        z-index: 9998;
+    }
+
+    .chatbot-header {
+        padding: 18px;
+        background: linear-gradient(135deg, #101d29, #0b1118);
+        border-bottom: 1px solid #263545;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chatbot-header h3 {
+        margin: 0;
+        color: #00d9ff;
+    }
+
+    .chatbot-header span {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+    .chatbot-close {
+        background: transparent;
+        color: white;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .chat-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+    }
+
+    .chat-message {
+        max-width: 85%;
+        padding: 11px 14px;
+        margin-bottom: 12px;
+        border-radius: 12px;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .bot-message {
+        background: #172330;
+        color: #e2e8f0;
+        border-bottom-left-radius: 3px;
+    }
+
+    .user-message {
+        background: #00bfe3;
+        color: #001018;
+        margin-left: auto;
+        border-bottom-right-radius: 3px;
+    }
+
+    .chat-input-area {
+        display: flex;
+        padding: 12px;
+        gap: 8px;
+        border-top: 1px solid #263545;
+    }
+
+    .chat-input-area input {
+        margin: 0;
+        flex: 1;
+        padding: 11px;
+    }
+
+    .chat-send {
+        width: 48px;
+        border: none;
+        border-radius: 8px;
+        background: #00d9ff;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    @media (max-width: 500px) {
+        .chatbot-box {
+            right: 10px;
+            bottom: 85px;
+            width: calc(100% - 20px);
+            height: 70vh;
+        }
+
+        .chatbot-button {
+            right: 15px;
+            bottom: 15px;
+        }
+    }
+</style>
+
+<button
+    class="chatbot-button"
+    onclick="toggleChatbot()"
+    title="AutoCare AI Assistant">
+    🤖
+</button>
+
+<div class="chatbot-box" id="chatbotBox">
+
+    <div class="chatbot-header">
+
+        <div>
+            <h3>AutoCare AI</h3>
+            <span>Vehicle Assistant</span>
+        </div>
+
+        <button
+            class="chatbot-close"
+            onclick="toggleChatbot()">
+            ×
+        </button>
+
+    </div>
+
+    <div
+        class="chat-messages"
+        id="chatMessages">
+
+        <div class="chat-message bot-message">
+            Hello! 👋 I am AutoCare-AI.<br><br>
+            Tell me about your vehicle problem.
+            I can help with engine, battery, brakes,
+            AC, tyres, mileage and maintenance.
+        </div>
+
+    </div>
+
+    <div class="chat-input-area">
+
+        <input
+            type="text"
+            id="chatInput"
+            placeholder="Ask about your vehicle..."
+            onkeydown="handleChatKey(event)"
+        >
+
+        <button
+            class="chat-send"
+            onclick="sendChatMessage()">
+            ➤
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+function toggleChatbot() {
+
+    const box = document.getElementById("chatbotBox");
+
+    if (box.style.display === "flex") {
+        box.style.display = "none";
+    } else {
+        box.style.display = "flex";
+        document.getElementById("chatInput").focus();
+    }
+}
+
+
+function handleChatKey(event) {
+
+    if (event.key === "Enter") {
+        sendChatMessage();
+    }
+
+}
+
+
+function addChatMessage(message, type) {
+
+    const messages = document.getElementById("chatMessages");
+
+    const div = document.createElement("div");
+
+    div.className = "chat-message " + type;
+
+    div.textContent = message;
+
+    messages.appendChild(div);
+
+    messages.scrollTop = messages.scrollHeight;
+
+}
+
+
+async function sendChatMessage() {
+
+    const input = document.getElementById("chatInput");
+
+    const message = input.value.trim();
+
+    if (!message) {
+        return;
+    }
+
+    addChatMessage(message, "user-message");
+
+    input.value = "";
+
+    addChatMessage("Thinking...", "bot-message");
+
+    const messages = document.getElementById("chatMessages");
+
+    const thinkingMessage = messages.lastElementChild;
+
+    try {
+
+        const response = await fetch("/api/chat", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                message: message
+            })
+
+        });
+
+        const data = await response.json();
+
+        thinkingMessage.remove();
+
+        if (data.success) {
+
+            addChatMessage(
+                data.response,
+                "bot-message"
+            );
+
+        } else {
+
+            addChatMessage(
+                data.message || "Unable to process your request.",
+                "bot-message"
+            );
+
+        }
+
+    } catch (error) {
+
+        thinkingMessage.remove();
+
+        addChatMessage(
+            "Unable to connect to AutoCare-AI.",
+            "bot-message"
+        );
+
+        console.error(error);
+    }
+}
+
+</script>
+
+</body>
+</html>

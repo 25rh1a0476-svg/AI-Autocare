@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}AI Vehicle Diagnosis{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>AI Vehicle Diagnosis</h1>
+
+        <p>
+            Describe the symptoms of your vehicle and the AI system
+            will analyze the possible problem.
+        </p>
+
+        <label>Select Vehicle</label>
+
+        <select id="vehicle_id">
+
+            {% for vehicle in vehicles %}
+
+            <option value="{{ vehicle['id'] }}">
+                {{ vehicle['name'] }} - {{ vehicle['brand'] }} {{ vehicle['model'] }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+        <label>Vehicle Symptoms</label>
+
+        <textarea
+            id="symptoms"
+            rows="6"
+            placeholder="Example: My car is overheating and coolant level is low."
+        ></textarea>
+
+        <button onclick="runDiagnosis()">
+            Analyze Vehicle
+        </button>
+
+        <div id="result" class="result"></div>
+
+    </div>
+
+</div>
+
+<script>
+
+async function runDiagnosis() {
+
+    const vehicleId = document.getElementById("vehicle_id").value;
+    const symptoms = document.getElementById("symptoms").value;
+    const resultBox = document.getElementById("result");
+
+    if (!symptoms.trim()) {
+
+        alert("Please enter vehicle symptoms.");
+
+        return;
+    }
+
+    resultBox.style.display = "block";
+
+    resultBox.innerHTML = "Analyzing vehicle symptoms...";
+
+    try {
+
+        const response = await fetch("/api/diagnose", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                vehicle_id: vehicleId,
+                symptoms: symptoms
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+
+            resultBox.innerHTML = data.message;
+
+            return;
+        }
+
+        const result = data.result;
+
+        resultBox.innerHTML = `
+
+            <h2>Diagnosis Result</h2>
+
+            <p>
+                <strong>Possible Problem:</strong>
+                ${result.diagnosis}
+            </p>
+
+            <p>
+                <strong>Severity:</strong>
+                ${result.severity}
+            </p>
+
+            <p>
+                <strong>Confidence:</strong>
+                ${result.confidence}%
+            </p>
+
+            <p>
+                <strong>Estimated Cost:</strong>
+                ${result.estimated_cost}
+            </p>
+
+            <h3>Recommendations</h3>
+
+            <ul>
+                ${result.recommendations.map(item => `<li>${item}</li>`).join("")}
+            </ul>
+
+        `;
+
+    } catch (error) {
+
+        resultBox.innerHTML =
+            "Unable to connect to the diagnosis system.";
+
+        console.error(error);
+    }
+}
+
+</script>
+
+{% endblock %}
